@@ -230,6 +230,7 @@ function renderNowStrip() {
     { label: "Last 30 days", value: fmt(last30), note: "rolling" },
     { label: "Peak day in range", value: fmt(peakVal), note: peakDay ? fmtDate(parseDay(peakDay), true) : "—" },
     { label: "Est. chat band", value: DATA.estimate.conversations ? `~${fmt(DATA.estimate.low)}–${fmt(DATA.estimate.high)}` : "not counted", note: "ChatGPT · floor estimate, never summed" },
+    { label: "API cost equivalent", value: DATA.estimatedCostUsd ? "$" + DATA.estimatedCostUsd.toLocaleString() : "—", note: "Claude Code · at published Anthropic rates" },
   ];
   const strip = document.getElementById("nowStrip");
   strip.innerHTML = measures.map((m) =>
