@@ -100,7 +100,15 @@ export default function SiteFooter() {
           </div>
         </div>
         <p className="text-center text-n-400 text-xs mt-12">
-          © 2026 Hud Wahab. All rights reserved.
+          © 2026 Hud Wahab ·{" "}
+          <a
+            href="https://multimodeai.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-n-600 transition-colors"
+          >
+            Multimode AI LLC
+          </a>
         </p>
       </div>
     </footer>
