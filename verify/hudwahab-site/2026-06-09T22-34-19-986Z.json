@@ -1,0 +1,568 @@
+{
+  "specFile": "/Users/hfox/Developments/hudwahab-site/specs/hudwahab-site.md",
+  "timestamp": "2026-06-09T22:34:19.986Z",
+  "model": "claude-sonnet-4-6",
+  "criteria": [
+    {
+      "criterion": "AC-01: npm run build completes with exit code 0 — zero TypeScript errors, zero ESLint errors.",
+      "status": "unverifiable",
+      "evidence": "Cannot execute build commands from this environment. All 9 components and page.tsx are syntactically valid TSX with proper exports. No obvious TypeScript issues detected in file review.",
+      "confidence": "low"
+    },
+    {
+      "criterion": "AC-02: npm run lint completes with exit code 0.",
+      "status": "unverifiable",
+      "evidence": "Cannot run lint commands. Code appears clean — no obvious ESLint violations such as missing keys (keys are present on mapped elements in SkillsSection, ServicesSection, WorkSection), no unused imports detected.",
+      "confidence": "low"
+    },
+    {
+      "criterion": "AC-03: No <img> elements exist anywhere in the codebase — only next/image or CSS backgrounds.",
+      "status": "met",
+      "evidence": "grep for '<img' in both components/ and app/ returned no matches. Photo placeholder in HeroSection.tsx is a plain <div> element.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-04: No 'use client' directive appears in any component file.",
+      "status": "met",
+      "evidence": "Search for 'use client' in components/ returned no matches. All 9 component files reviewed — none contain the directive.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-05: No dark mode classes (dark:) appear anywhere in the codebase.",
+      "status": "met",
+      "evidence": "Search for 'dark:' in components/ and app/ returned no matches.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-06: app/page.tsx contains exactly these 9 imports: SiteNav, HeroSection, SkillsSection, CredibilitySection, ServicesSection, WorkSection, SubstackSection, ContactSection, SiteFooter — rendered in that order inside a single <main> element.",
+      "status": "met",
+      "evidence": "app/page.tsx lines 1-9 import all 9 components in the exact specified order. The return statement wraps all 9 in a single <main> element in the same order.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-07: app/page.tsx contains no reference to Geist font, Next.js logo, Vercel logo, or any default scaffold content.",
+      "status": "met",
+      "evidence": "Search for 'Geist|geist|Next.js logo|Vercel' in app/page.tsx returned no matches. The file contains only the 9 imports and a minimal Home() function.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-08: Nav is position: sticky at top: 0 with a white background.",
+      "status": "met",
+      "evidence": "SiteNav.tsx line 3: <nav className=\"sticky top-0 z-50 bg-white border-b border-n-200\"> — uses Tailwind 'sticky', 'top-0', 'bg-white'.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-09: Logo text is 'hud.' rendered in font-script (Dancing Script), colored #ff5f00.",
+      "status": "met",
+      "evidence": "SiteNav.tsx line 5: <a href=\"#\" className=\"font-script text-2xl text-accent\">hud.</a>. tailwind.config.ts confirms font-script maps to Dancing Script and text-accent maps to #ff5f00.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-10: Nav contains exactly 4 links: 'Home' → href='#', 'Work' → href='#work', 'Services' → href='#services', 'Contact' → href='#contact'.",
+      "status": "met",
+      "evidence": "SiteNav.tsx contains a <ul> with 4 <li> items: Home (#), Work (#work), Services (#services), Contact (#contact) — all verified in the file.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-11: 'Home' link has text color #ff5f00 (accent) as a static style — no JavaScript, no scroll-spy.",
+      "status": "met",
+      "evidence": "SiteNav.tsx line 10: <a href=\"#\" className=\"text-accent text-sm font-medium\">Home</a> — static class, no dynamic JS.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-12: Pill CTA label is 'Let's Chat' with an inline chat bubble SVG icon, href='#contact', styled bg-n-900 text-white rounded-full.",
+      "status": "met",
+      "evidence": "SiteNav.tsx line 41: className includes 'bg-n-900 text-white ... rounded-full'. Line 55: 'Let&apos;s Chat'. href='#contact'. Inline SVG chat bubble at lines 43-53.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-13: No 'use client' directive in SiteNav.tsx.",
+      "status": "met",
+      "evidence": "Global search for 'use client' in components/ returned no matches. SiteNav.tsx reviewed — no directive present.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-14: A small uppercase muted label 'INTRODUCTION' appears above 'Hello,' — styled text-xs font-semibold tracking-widest text-n-400 uppercase.",
+      "status": "met",
+      "evidence": "HeroSection.tsx line 7: <p className=\"text-xs font-semibold tracking-widest text-n-400 uppercase mb-4\">INTRODUCTION</p> — exact class match.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-15: 'Hello,' renders in text-accent (#ff5f00).",
+      "status": "met",
+      "evidence": "HeroSection.tsx line 11: <h1 className=\"text-5xl font-bold text-accent mb-2\">Hello,</h1>",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-16: Name/title line renders verbatim: 'My name is Hud Wahab. I'm an ML engineer building AI at the intersection of defense systems and autonomous AI — and I help businesses ship AI that actually works through Multimode AI LLC.'",
+      "status": "met",
+      "evidence": "HeroSection.tsx lines 13-17 contain the verbatim text with em-dash, using JSX apostrophe escaping (&apos;) which renders correctly. Text matches character-for-character.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-17: Body paragraph renders verbatim: '10+ years from materials science research labs to active federal AI contracts. I have 20+ peer-reviewed publications (200+ citations), defense work with DOD, DTRA, and SpaceWERX, and I've built production ML systems that run in the real world. Multimode AI is my consulting practice for founders and operators who want the same.'",
+      "status": "met",
+      "evidence": "HeroSection.tsx lines 19-25 contain the verbatim paragraph text with correct punctuation and JSX escaping.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-18: Location line renders: 'CO'",
+      "status": "met",
+      "evidence": "HeroSection.tsx line 27: <p className=\"text-n-500 text-sm mb-6\">CO</p> — matches spec exactly.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-19: GitHub icon (SVG) links to https://github.com/hududed, target='_blank', rel='noopener noreferrer'.",
+      "status": "met",
+      "evidence": "HeroSection.tsx lines 29-37: href=\"https://github.com/hududed\" target=\"_blank\" rel=\"noopener noreferrer\" with inline SVG GitHub icon.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-20: LinkedIn icon (SVG) links to https://linkedin.com/in/hudwahab, target='_blank', rel='noopener noreferrer'.",
+      "status": "met",
+      "evidence": "HeroSection.tsx lines 47-59: href=\"https://linkedin.com/in/hudwahab\" target=\"_blank\" rel=\"noopener noreferrer\" with inline SVG LinkedIn icon.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-21: Photo placeholder is a grey rect: w-full max-w-xs aspect-[3/4] rounded-2xl bg-n-200. No text, no <img>, no <Image> — pure CSS div.",
+      "status": "met",
+      "evidence": "HeroSection.tsx final div: <div className=\"w-full max-w-xs aspect-[3/4] rounded-2xl bg-n-200 flex-shrink-0\" /> — self-closing, no children, no <img>/<Image>.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-22: Layout is flex flex-col md:flex-row — stacked on mobile, two-column on ≥ md.",
+      "status": "met",
+      "evidence": "HeroSection.tsx line 6: <div className=\"flex flex-col md:flex-row items-center gap-12\">",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-23: Section renders exactly 4 cards in a grid grid-cols-1 md:grid-cols-2 layout.",
+      "status": "met",
+      "evidence": "SkillsSection.tsx: skills array has 4 items (lines 1-79). Grid div line 85: className=\"grid grid-cols-1 md:grid-cols-2 gap-6\". Rendered via .map().",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-24: Each card has: uppercase muted 'SKILL' label → SVG icon (~28px) → title → body text in that exact vertical order.",
+      "status": "met",
+      "evidence": "SkillsSection.tsx card structure: (1) <p>SKILL</p> (2) <div>{skill.icon}</div> (3) <h3>{skill.title}</h3> (4) <p>{skill.body}</p> — correct order.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-25: Card styles: bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-shadow.",
+      "status": "met",
+      "evidence": "SkillsSection.tsx line 88: className=\"bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-shadow p-8\"",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-26: Card 1 — icon: bot/circuit SVG, title: 'AI Agent Engineering', body verbatim.",
+      "status": "met",
+      "evidence": "SkillsSection.tsx skills[0]: title 'AI Agent Engineering', body matches spec verbatim, icon is a circuit-board style SVG with rect and path elements.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-27: Card 2 — icon: beaker/flask SVG, title: 'Research & Applied ML', body verbatim.",
+      "status": "met",
+      "evidence": "SkillsSection.tsx skills[1]: title 'Research & Applied ML', body matches spec verbatim, icon is a flask/beaker SVG with path elements.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-28: Card 3 — icon: layers/server SVG, title: 'Systems Architecture', body verbatim.",
+      "status": "met",
+      "evidence": "SkillsSection.tsx skills[2]: title 'Systems Architecture', body matches spec verbatim, icon has three stacked rectangles (server/layers style).",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-29: Card 4 — icon: compass SVG, title: 'Strategic AI Advisory', body verbatim.",
+      "status": "met",
+      "evidence": "SkillsSection.tsx skills[3]: title 'Strategic AI Advisory', body matches spec verbatim, icon is a circle with polygon (compass style).",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-30: SVG icons are inline (not <Image>), 28×28px, stroke-current, no fill, strokeWidth='1.5' — consistent across all 4.",
+      "status": "partial",
+      "evidence": "All 4 icons are inline SVGs with width='28' height='28', fill='none', strokeWidth='1.5'. However, icons use the HTML attribute stroke='currentColor' rather than the Tailwind class 'stroke-current'. The spec requires 'stroke-current' as a class. Functionally equivalent but technically not the Tailwind token form.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-31: Section renders exactly 3 stat callout items in a horizontal row (flex flex-row), wrapping to single column on mobile.",
+      "status": "met",
+      "evidence": "CredibilitySection.tsx: <div className=\"flex flex-col md:flex-row\"> — 3 child divs, each with flex-1. Stacks on mobile (flex-col), horizontal on md+ (md:flex-row).",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-32: Each item has a large bold number/label, and a short descriptor below it.",
+      "status": "met",
+      "evidence": "CredibilitySection.tsx: each item has a <p className=\"text-3xl font-bold text-n-900\"> stat followed by <p className=\"text-sm text-n-500 mt-1\"> descriptor.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-33: Item 1 — stat: '20+', label: 'peer-reviewed publications' — Carbon, Physical Review B, Ceramics International, IJCAI.",
+      "status": "met",
+      "evidence": "CredibilitySection.tsx lines 7-11: '20+' as stat, 'peer-reviewed publications' as label, 'Carbon, Physical Review B, Ceramics International, IJCAI' as sub-label.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-34: Item 2 — stat: 'DOD · DTRA · SpaceWERX', label: 'active federal AI contracts'.",
+      "status": "met",
+      "evidence": "CredibilitySection.tsx lines 14-16: 'DOD · DTRA · SpaceWERX' as stat (using · middle dot), 'active federal AI contracts' as label.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-35: Item 3 — stat: '10+', label: 'years from research lab to production'.",
+      "status": "met",
+      "evidence": "CredibilitySection.tsx lines 18-20: '10+' as stat, 'years from research lab to production' as label.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-36: Items are separated by a vertical divider (border-r border-n-200) except the last.",
+      "status": "met",
+      "evidence": "CredibilitySection.tsx: items 1 and 2 have 'md:border-r border-n-200' (responsive — vertical only on md+). Item 3 has no border-r. On mobile they use 'border-b'. Functionally satisfies vertical divider requirement.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-37: No card wrapper — this section is open/flat, no bg-white container.",
+      "status": "met",
+      "evidence": "CredibilitySection.tsx has no 'bg-white' class anywhere — search confirmed no bg-white in that file. Items are plain divs inside the section.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-38: Stat text uses text-3xl font-bold text-n-900; label uses text-sm text-n-500.",
+      "status": "met",
+      "evidence": "CredibilitySection.tsx: all 3 stat <p> elements use 'text-3xl font-bold text-n-900', all 3 descriptor <p> elements use 'text-sm text-n-500 mt-1'.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-39: Section has id='services'.",
+      "status": "met",
+      "evidence": "ServicesSection.tsx line 27: <section id=\"services\" className=\"py-16\">",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-40: Section contains exactly 3 cards using the card-in-card CTA pattern.",
+      "status": "met",
+      "evidence": "ServicesSection.tsx: services array has exactly 3 items, rendered via .map(). Each uses the card-in-card pattern (outer bg-white card, inner border CTA card).",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-41: Outer card: bg-white rounded-3xl shadow-card. Inner CTA card: border border-n-200 rounded-2xl. Inner card layout: CTA label text at top, large ↗ arrow SVG alone at bottom — NOT inline with label text.",
+      "status": "met",
+      "evidence": "ServicesSection.tsx: outer card has 'bg-white rounded-3xl shadow-card'. Inner <a> has 'border border-n-200 rounded-2xl p-6 flex flex-col justify-between'. Inside: <span> at top, <svg> at bottom with 'self-end' — separated by flex justify-between.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-42: Card 1 — outer label: 'AI AGENT SPRINT', description verbatim, inner CTA: 'Get started', arrow SVG, href='#'.",
+      "status": "met",
+      "evidence": "ServicesSection.tsx services[0]: label 'AI AGENT SPRINT', description matches spec verbatim, cta 'Get started', href '#'.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-43: Card 2 — outer label: 'STRATEGY SESSION', description verbatim, inner CTA: 'Book a session', arrow SVG, href='#'.",
+      "status": "met",
+      "evidence": "ServicesSection.tsx services[1]: label 'STRATEGY SESSION', description matches spec verbatim, cta 'Book a session', href '#'.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-44: Card 3 — outer label: 'RETAINER', description verbatim, inner CTA: 'Apply', arrow SVG, href='#'.",
+      "status": "met",
+      "evidence": "ServicesSection.tsx services[2]: label 'RETAINER', description matches spec verbatim, cta 'Apply', href '#'.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-45: Section has id='work'.",
+      "status": "met",
+      "evidence": "WorkSection.tsx line 34: <section id=\"work\" className=\"py-16\">",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-46: Section renders exactly 4 work items — no more, no fewer.",
+      "status": "met",
+      "evidence": "WorkSection.tsx: works array has exactly 4 items (ProWasl, Bayanlab, Autolabmate, mm-cli), rendered via .map().",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-47: Item 1 — title: 'ProWasl', description verbatim, href='#'.",
+      "status": "met",
+      "evidence": "WorkSection.tsx works[0]: title 'ProWasl', description matches spec verbatim including em-dashes and punctuation, href '#'.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-48: Item 2 — title: 'Bayanlab', description verbatim, href='#'.",
+      "status": "met",
+      "evidence": "WorkSection.tsx works[1]: title 'Bayanlab', description matches spec verbatim, href '#'.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-49: Item 3 — title: 'Autolabmate', description verbatim, href='#'.",
+      "status": "met",
+      "evidence": "WorkSection.tsx works[2]: title 'Autolabmate', description matches spec verbatim, href '#'.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-50: Item 4 — title: 'mm-cli', description verbatim, href='https://multimodeai.substack.com', target='_blank', rel='noopener noreferrer'.",
+      "status": "met",
+      "evidence": "WorkSection.tsx works[3]: title 'mm-cli', description verbatim, href 'https://multimodeai.substack.com', external:true used to conditionally apply target='_blank' rel='noopener noreferrer'.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-51: Each item visually indicates it is a link (arrow or external indicator).",
+      "status": "met",
+      "evidence": "WorkSection.tsx: each <li><a> contains a northeast arrow SVG (20×20) with text-n-400 group-hover:text-n-900, indicating link affordance.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-52: Single card using card-in-card CTA pattern (same structure as ServicesSection cards).",
+      "status": "met",
+      "evidence": "SubstackSection.tsx uses identical card-in-card structure: outer bg-white rounded-3xl with flex layout, inner <a> with border border-n-200 rounded-2xl flex-col justify-between.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-53: Outer label: 'NEWSLETTER' (uppercase muted).",
+      "status": "met",
+      "evidence": "SubstackSection.tsx line 8: <p className=\"text-xs font-semibold tracking-widest text-n-400 uppercase mb-3\">NEWSLETTER</p>",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-54: Description: 'Prompt kits and field notes from a builder shipping with AI. No fluff.'",
+      "status": "met",
+      "evidence": "SubstackSection.tsx lines 11-13: verbatim text 'Prompt kits and field notes from a builder shipping with AI. No fluff.'",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-55: Inner CTA label: 'Subscribe', arrow SVG, href='https://multimodeai.substack.com', target='_blank', rel='noopener noreferrer'.",
+      "status": "met",
+      "evidence": "SubstackSection.tsx lines 15-16: href='https://multimodeai.substack.com' target='_blank' rel='noopener noreferrer'. Line 20: <span>Subscribe</span>. Arrow SVG present.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-56: Section has id='contact'.",
+      "status": "met",
+      "evidence": "ContactSection.tsx line 3: <section id=\"contact\" className=\"py-16\">",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-57: Single card using card-in-card CTA pattern.",
+      "status": "met",
+      "evidence": "ContactSection.tsx uses identical card-in-card pattern: outer bg-white rounded-3xl, inner <a> with border border-n-200 rounded-2xl flex-col justify-between.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-58: Outer label: 'WORK TOGETHER?' (uppercase muted).",
+      "status": "met",
+      "evidence": "ContactSection.tsx line 7: <p className=\"text-xs font-semibold tracking-widest text-n-400 uppercase mb-3\">WORK TOGETHER?</p>",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-59: Description: 'If you're building something worth building, reach out directly.'",
+      "status": "met",
+      "evidence": "ContactSection.tsx lines 10-12: 'If you&apos;re building something worth building, reach out directly.' — renders correctly.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-60: Inner CTA label: 'Get in touch', arrow SVG, href='mailto:hudwahab@gmail.com'.",
+      "status": "met",
+      "evidence": "ContactSection.tsx line 14: href=\"mailto:hudwahab@gmail.com\". Line 18: <span>Get in touch</span>. Arrow SVG present.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-61: No form element, no server action, no input fields — mailto only.",
+      "status": "met",
+      "evidence": "ContactSection.tsx contains no <form>, no <input>, no server actions. Only a mailto href link.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-62: Logo text 'hud.' in font-script, centered, matching nav logo style.",
+      "status": "partial",
+      "evidence": "SiteFooter.tsx line 5: <p className=\"font-script text-2xl text-n-900 text-center\">hud.</p>. Uses font-script and is centered, but color is text-n-900 rather than text-accent. The spec says 'matching nav logo style' but the Task 8 note explicitly assumes 'text-n-900 not text-accent'. This is an ambiguous assumption built into the spec itself.",
+      "confidence": "medium"
+    },
+    {
+      "criterion": "AC-63: Two columns: PAGES with 4 links, LINKS with GitHub, LinkedIn, Substack. All external links have target='_blank' rel='noopener noreferrer'.",
+      "status": "met",
+      "evidence": "SiteFooter.tsx: PAGES column has Home/Work/Services/Contact with correct hrefs. LINKS column has GitHub (https://github.com/hududed), LinkedIn (https://linkedin.com/in/hudwahab), Substack (https://multimodeai.substack.com). All 3 have target='_blank' rel='noopener noreferrer' (lines 48, 70, 94).",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-64: Copyright line renders: '© 2026 Hud Wahab. All rights reserved.'",
+      "status": "met",
+      "evidence": "SiteFooter.tsx final <p>: '© 2026 Hud Wahab. All rights reserved.' — verbatim match.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-65: Every section uses a shared container class pattern: max-w-5xl mx-auto px-6.",
+      "status": "met",
+      "evidence": "Search found 'max-w-5xl mx-auto px-6' in all 8 component files: SiteNav, HeroSection, SkillsSection, CredibilitySection, ServicesSection, WorkSection, SubstackSection, ContactSection, SiteFooter.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-66: Every section has vertical padding of py-16 minimum.",
+      "status": "met",
+      "evidence": "All sections use py-16 or greater: HeroSection=py-20, SkillsSection=py-16, CredibilitySection=py-16, ServicesSection=py-16, WorkSection=py-16, SubstackSection=py-16, ContactSection=py-16. SiteNav is not a section. SiteFooter uses py-12 but is a footer, not a section.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-67: globals.css contains html { scroll-behavior: smooth } and body { background-color: #fafafa; color: #171717; }.",
+      "status": "met",
+      "evidence": "app/globals.css verified: 'html { scroll-behavior: smooth; }' and 'body { background-color: #fafafa; color: #171717; }' — exact match.",
+      "confidence": "high"
+    },
+    {
+      "criterion": "AC-68: No horizontal scroll occurs at viewport width 375px or wider.",
+      "status": "unverifiable",
+      "evidence": "Cannot render in browser to test viewport. All two-column layouts use flex-col (mobile) with md:flex-row (desktop). No fixed-width elements wider than max-w-xs visible. min-w-[180px] on CTA cards could theoretically cause overflow in very narrow flex containers but is contained within md:flex-row layouts that stack on mobile.",
+      "confidence": "low"
+    }
+  ],
+  "constraints": [
+    {
+      "constraint": "Implement all 9 components as pure server components (no 'use client' anywhere).",
+      "type": "must_do",
+      "status": "satisfied",
+      "evidence": "Search for 'use client' in components/ and app/ returned no matches. All 9 components are pure server components."
+    },
+    {
+      "constraint": "Use only Tailwind utility classes for all styling — no inline style={{}} objects, no CSS modules, no styled-components.",
+      "type": "must_do",
+      "status": "satisfied",
+      "evidence": "Search for 'style={{' in components/ returned no matches. No CSS module imports or styled-components imports found in any file."
+    },
+    {
+      "constraint": "Use the exact custom Tailwind tokens defined in tailwind.config.ts: accent, n-50 through n-900, shadow-card, shadow-card-hover, font-sans, font-script.",
+      "type": "must_do",
+      "status": "satisfied",
+      "evidence": "Components use text-accent, text-n-400/500/600/900, bg-n-200/900, shadow-card, shadow-card-hover, font-script throughout. No raw hex values in class strings detected."
+    },
+    {
+      "constraint": "Use inline SVGs (not next/image, not external icon libraries) for all icons.",
+      "type": "must_do",
+      "status": "satisfied",
+      "evidence": "All icons are inline SVG elements. No next/image imports for icons found. No heroicons, lucide, fontawesome imports detected in any component."
+    },
+    {
+      "constraint": "All SVG icons: 28×28 for skill cards, 20×20 for arrow CTAs, stroke-current, fill='none', strokeWidth={1.5}.",
+      "type": "must_do",
+      "status": "not_assessed",
+      "evidence": "Skill card SVGs: 28×28 ✓, fill='none' ✓, strokeWidth='1.5' ✓. Arrow CTAs: 20×20 ✓. However, icons use the HTML attribute stroke='currentColor' rather than the Tailwind CSS class 'stroke-current'. The constraint says 'stroke-current' (Tailwind class) but implementation uses the equivalent SVG attribute. Functionally identical but technically diverges from the constraint wording."
+    },
+    {
+      "constraint": "Rewrite app/page.tsx completely — strip all default scaffold content.",
+      "type": "must_do",
+      "status": "satisfied",
+      "evidence": "app/page.tsx contains only the 9 component imports and a minimal Home() function returning <main> with the components. No scaffold content present."
+    },
+    {
+      "constraint": "Place anchor id attributes on section wrapper elements of WorkSection (id='work'), ServicesSection (id='services'), ContactSection (id='contact').",
+      "type": "must_do",
+      "status": "satisfied",
+      "evidence": "WorkSection.tsx line 34: id='work' on <section>. ServicesSection.tsx line 27: id='services' on <section>. ContactSection.tsx line 3: id='contact' on <section>."
+    },
+    {
+      "constraint": "Every external link must have target='_blank' rel='noopener noreferrer'.",
+      "type": "must_do",
+      "status": "satisfied",
+      "evidence": "All external links verified: GitHub (HeroSection, SiteFooter), LinkedIn (HeroSection, SiteFooter), Substack (SubstackSection, SiteFooter, WorkSection mm-cli) all have target='_blank' rel='noopener noreferrer'. mailto link in ContactSection correctly omits these."
+    },
+    {
+      "constraint": "npm run build must pass with zero errors before the task is considered done.",
+      "type": "must_do",
+      "status": "not_assessed",
+      "evidence": "Cannot execute build commands. Code review shows no obvious TypeScript errors — all components are valid TSX with proper default exports, no type errors visible."
+    },
+    {
+      "constraint": "Do not introduce dark mode — no dark: Tailwind variants anywhere.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "Search for 'dark:' in components/ and app/ returned no matches."
+    },
+    {
+      "constraint": "Do not add 'use client' to any component.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "Search for 'use client' in all component files returned no matches."
+    },
+    {
+      "constraint": "Do not use <img> — use next/image <Image> for real images; for photo placeholder, use a plain <div>.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "No <img> elements found anywhere. HeroSection photo placeholder is a self-closing <div> with only Tailwind classes."
+    },
+    {
+      "constraint": "Do not add any CSS framework, icon library (Heroicons, Lucide, FontAwesome), or UI component library.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "No imports from icon or UI libraries found in any component. package.json reviewed — no such packages added."
+    },
+    {
+      "constraint": "Do not add a second layout.tsx inside any subdirectory.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "Only one layout.tsx exists at app/layout.tsx. No subdirectories with layout files found."
+    },
+    {
+      "constraint": "Do not add authentication, database, CMS, server actions, or API routes.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "No api/ routes, no server actions, no auth imports, no database connections found in the codebase."
+    },
+    {
+      "constraint": "Do not add scroll-spy, IntersectionObserver, or any JavaScript-driven active state.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "No 'use client', no IntersectionObserver, no scroll event handlers, no useState/useEffect found anywhere in components."
+    },
+    {
+      "constraint": "Do not modify tailwind.config.ts, app/layout.tsx, app/globals.css, or next.config.mjs.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "These files appear to be in the original specified state based on their content. tailwind.config.ts contains exactly the specified tokens. globals.css has only the scroll-behavior and body rules. layout.tsx loads the two specified fonts."
+    },
+    {
+      "constraint": "Do not add any dependency to package.json — all required packages are already installed.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "package.json reviewed — dependencies are: gray-matter, jose, next, react, react-dom, react-markdown, remark-gfm. No new packages added beyond what was presumably pre-installed."
+    },
+    {
+      "constraint": "Do not commit .env.local.",
+      "type": "must_not",
+      "status": "satisfied",
+      "evidence": "No .env.local file found in the project root listing."
+    },
+    {
+      "constraint": "Prefer flex layouts over grid when rendering a single row or column.",
+      "type": "prefer",
+      "status": "satisfied",
+      "evidence": "Single-row layouts (nav items, social icons, credibility stats, service cards, work items) all use flex. Grid used only for SkillsSection 2-column layout."
+    },
+    {
+      "constraint": "Prefer grid grid-cols-1 md:grid-cols-2 for 2-column responsive layouts.",
+      "type": "prefer",
+      "status": "satisfied",
+      "evidence": "SkillsSection.tsx uses 'grid grid-cols-1 md:grid-cols-2 gap-6' for the 4-card 2-column layout."
+    },
+    {
+      "constraint": "Prefer group + group-hover: for card hover states rather than JavaScript.",
+      "type": "prefer",
+      "status": "satisfied",
+      "evidence": "ServicesSection, SubstackSection, ContactSection, WorkSection all use 'group' and 'group-hover:' classes for hover interactions without JavaScript."
+    },
+    {
+      "constraint": "Prefer semantic HTML: nav, main, section, footer, ul/li for lists.",
+      "type": "prefer",
+      "status": "satisfied",
+      "evidence": "SiteNav uses <nav>, page.tsx uses <main>, all content sections use <section>, SiteFooter uses <footer>, nav links and work items use <ul>/<li>."
+    }
+  ],
+  "definitionOfDone": {
+    "met": false,
+    "reasoning": "7 of 8 DoD conditions are verifiably met: (1) All 9 component files exist with correct filenames in components/. (2) app/page.tsx fully rewritten with 9-component composition. (3) npm run build cannot be verified without execution. (4) npm run lint cannot be verified without execution. (5) 65 of 68 ACs are fully met; AC-30 and AC-62 are partial (stroke-current vs stroke='currentColor' attribute; footer logo color assumption); AC-68 is unverifiable without browser rendering. (6) No <img> tags, no 'use client', no 'dark:' variants confirmed absent. (7) All 3 anchor IDs present on section wrappers. (8) All external links have target='_blank' rel='noopener noreferrer'. The definition states 'there is no partial done state' and requires build pass (AC-01, AC-02) plus all 68 ACs verifiable as true. Since AC-01, AC-02, and AC-68 are unverifiable without runtime execution, and AC-30 has a minor deviation (SVG attribute vs Tailwind class), the DoD cannot be declared fully met from static analysis alone. The codebase is functionally complete and very likely to pass a build, but runtime verification is required."
+  },
+  "summary": {
+    "totalCriteria": 68,
+    "met": 63,
+    "notMet": 0,
+    "partial": 2,
+    "unclear": 0,
+    "unverifiable": 3,
+    "score": "63/65 verifiable criteria met (3 runtime-only)"
+  }
+}
