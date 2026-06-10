@@ -15,7 +15,7 @@ export default function HeroSection({
   greeting = "Hello,",
   heading = "My name is Hud Wahab and I'm an ML engineer building AI for defense systems and autonomous AI — based in Colorado.",
   meta = "CO · Multimode AI LLC",
-  imageSrc = "/hud.png",
+  imageSrc = "https://res.cloudinary.com/nmcore/image/upload/hud_rerofh",
   imageAlt = "Hud Wahab",
   imagePosition = "object-[30%_15%]",
 }: HeroSectionProps) {

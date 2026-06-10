@@ -23,7 +23,7 @@ export default function AboutMe() {
         label="ABOUT ME"
         greeting=""
         heading="My name is Hud Wahab and I'm an ML engineer building AI at the intersection of defense systems and autonomous AI."
-        imageSrc="/hud-river.jpg"
+        imageSrc="https://res.cloudinary.com/nmcore/image/upload/hud-river_qg866f"
         imageAlt="Hud Wahab crossing a river on a backcountry trek"
         imagePosition="object-[center_40%]"
       />

@@ -46,3 +46,8 @@ next-env.d.ts
 /*.png
 /*.jpg
 /*.jpeg
+
+# images served from Cloudinary, not committed
+/public/*.png
+/public/*.jpg
+/public/*.jpeg

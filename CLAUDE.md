@@ -64,14 +64,14 @@ components/
   FadeIn.tsx         — ONLY "use client" component; scroll fade-in (1.2s)
   SiteFooter.tsx     — Wreath name + PAGES (Home/About me/Contact) + LINKS (GitHub/LinkedIn/Substack icons)
 
-public/
-  hud.png            — home hero photo (creek selfie)
-  hud-river.jpg      — about-me hero photo (river crossing)
-
 specs/               — spec files for mm harness verify
 ```
 
-Photos: home hero = `hud.png`; about-me hero = `hud-river.jpg`. Use `<Image>` (never `<img>`).
+**Photos: served from Cloudinary** (cloud `nmcore`), NOT committed to git (`/public/*.{png,jpg,jpeg}` is gitignored). `next.config.mjs` allows `res.cloudinary.com/nmcore/**` in `images.remotePatterns`.
+- home hero  = `https://res.cloudinary.com/nmcore/image/upload/hud_rerofh`
+- about hero = `https://res.cloudinary.com/nmcore/image/upload/hud-river_qg866f`
+
+Use Next `<Image>` (never `<img>`). To add a new photo: upload to Cloudinary (`nmcore`) and reference its delivery URL — don't commit image files.
 
 ## Key Visual Pattern: Card-in-Card CTA
 
