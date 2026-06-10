@@ -33,7 +33,9 @@ const hideTip = () => { tooltip.dataset.visible = "false"; };
 
 // ---- state -----------------------------------------------------------------
 let DATA = null;
-let range = "180"; // 90 | 180 | 365 | all
+// initial range from ?range= (90 | 180 | 365 | all), default 180
+let range = (new URLSearchParams(location.search).get("range") || "180");
+if (!["90", "180", "365", "all"].includes(range)) range = "180";
 
 // measured math uses exact lanes only; estimate lanes render but never sum in.
 const exactLanes = () => DATA.lanes.filter((l) => l.fidelity === "exact");
@@ -388,6 +390,11 @@ fetch("data.json")
   .then((r) => r.json())
   .then((d) => {
     DATA = d;
+    // reflect the initial range on the control buttons
+    for (const b of document.querySelectorAll("#rangeControls button")) {
+      if (b.dataset.range === range) b.setAttribute("aria-pressed", "true");
+      else b.removeAttribute("aria-pressed");
+    }
     const gen = new Date(d.generatedAt);
     document.getElementById("updated").textContent =
       `Updated ${fmtDate(gen, true)} · ${DATA.lanes.map(l => `${l.label} ${fmt(l.total)}`).join(" · ")}`;
