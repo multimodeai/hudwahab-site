@@ -20,6 +20,13 @@ const works = [
     href: "https://github.com/multimodeai/mm-cli/tree/main",
     external: true,
   },
+  {
+    title: "Token Burn Dashboard",
+    description:
+      "A GitHub-style view of my daily AI token usage — Claude Code and Codex, counted exactly from my own local logs. I instrument what I ship.",
+    href: "/token-burn/index.html",
+    external: true,
+  },
 ];
 
 export default function WorkSection() {

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hud's AI Token Burn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Hud's AI Token Burn</h1>
+        <p class="dek">Daily token volume across Claude Code and Codex, counted exactly from
+          local logs, plus a labeled estimate band for chat tools that report no tokens.
+          Measured lanes are never summed with estimates.</p>
+        <p class="updated" id="updated">&nbsp;</p>
+      </div>
+      <div class="controls" id="rangeControls" role="group" aria-label="Time range">
+        <button data-range="90" type="button">90d</button>
+        <button data-range="180" type="button" aria-pressed="true">180d</button>
+        <button data-range="365" type="button">1y</button>
+        <button data-range="all" type="button">All</button>
+      </div>
+    </header>
+
+    <div class="now-strip" id="nowStrip"></div>
+
+    <section class="section primary-chart">
+      <div class="section-head">
+        <h2>Daily token burn</h2>
+        <span class="note">Weekly total line: log y-scale; daily cells: log color scale</span>
+      </div>
+      <div class="heatmap-wrap">
+        <div class="calendar" id="calendar"></div>
+      </div>
+      <div class="legend-row">
+        <span class="muted" id="activeDaysNote">&nbsp;</span>
+        <span class="legend">
+          <span class="legend-label">Less</span>
+          <span class="legend-swatch"></span><span class="legend-swatch"></span><span class="legend-swatch"></span>
+          <span class="legend-swatch"></span><span class="legend-swatch"></span><span class="legend-swatch"></span>
+          <span class="legend-label" style="margin-left:4px">More</span>
+        </span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>What is driving the burn?</h2>
+        <span class="note">Sorted by tool and project; exact lanes plus separated estimate</span>
+      </div>
+      <table class="breakdown-table">
+        <thead>
+          <tr><th>Driver</th><th>Trend</th><th>Share</th><th>Total</th></tr>
+        </thead>
+        <tbody id="breakdownBody"></tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Trend</h2>
+        <span class="note">Exact lanes only — estimates excluded</span>
+      </div>
+      <div class="trend-grid" id="trendGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Recent days</h2>
+        <span class="note">Last 14 active days, Pacific-agnostic local dates</span>
+      </div>
+      <table class="recent-table">
+        <thead>
+          <tr><th>Date</th><th>Total</th><th>Claude Code</th><th>Codex</th><th>ChatGPT</th></tr>
+        </thead>
+        <tbody id="recentBody"></tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Scale equivalents</h2>
+        <span class="note">Fermi estimates from the current measured total</span>
+      </div>
+      <table class="equivalent-table">
+        <thead>
+          <tr><th>Measure</th><th>Equivalent</th><th>Basis</th></tr>
+        </thead>
+        <tbody id="equivBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

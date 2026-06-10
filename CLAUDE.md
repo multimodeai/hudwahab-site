@@ -65,6 +65,12 @@ components/
   SiteFooter.tsx     — Wreath name + PAGES (Home/About me/Contact) + LINKS (GitHub/LinkedIn/Substack icons)
 
 specs/               — spec files for mm harness verify
+
+public/token-burn/   — static Token Burn dashboard (vanilla HTML/JS), light-themed to match
+                       the site; linked from Selected Work at /token-burn/index.html.
+                       SNAPSHOT of local-log token usage — refresh with `npm run refresh:burn`
+                       (source repo: ~/Developments/token-burn-dashboard). data.json is a
+                       scrubbed aggregate; eyeball byProject for client names before pushing.
 ```
 
 **Photos: served from Cloudinary** (cloud `nmcore`), NOT committed to git (`/public/*.{png,jpg,jpeg}` is gitignored). `next.config.mjs` allows `res.cloudinary.com/nmcore/**` in `images.remotePatterns`.
@@ -130,6 +136,7 @@ Three packages on `/about-me` (`ServicesSection.tsx`). **Deposit-first** model: 
 npm run dev          # local dev server :3000
 npm run build        # production build (must pass before deploy)
 npm run lint         # ESLint check
+npm run refresh:burn # rebuild Token Burn snapshot from local logs -> public/token-burn
 
 # Spec tooling (run from project root)
 mm spec new hudwahab-site     # 3-phase interview → specs/hudwahab-site.md
