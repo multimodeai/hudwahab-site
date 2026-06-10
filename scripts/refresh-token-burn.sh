@@ -18,8 +18,10 @@ if [ ! -d "$DASH" ]; then
   exit 1
 fi
 
-echo "→ Rebuilding dashboard data from local logs…"
-( cd "$DASH" && npm run build )
+echo "→ Rebuilding dashboard data from local logs (SCRUBBED public build)…"
+# IMPORTANT: hudwahab-site is a PUBLIC repo. Always use the scrubbed build
+# (SCRUB=1) so real client/internal project names from scrub.json are aliased.
+( cd "$DASH" && npm run build:public )
 
 echo "→ Copying build into $DEST"
 mkdir -p "$DEST"

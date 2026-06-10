@@ -182,7 +182,8 @@ h2 {
 
 .breakdown-table th:nth-child(2),
 .breakdown-table td:nth-child(2) {
-  width: 92px;
+  width: 140px;
+  overflow: hidden;
 }
 
 .breakdown-table th:nth-child(3),
@@ -228,6 +229,14 @@ h2 {
   font-weight: 650;
   font-size: 14px;
 }
+.mdl-toggle {
+  cursor: pointer;
+  font-size: 10px;
+  opacity: 0.5;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+.mdl-toggle:hover { opacity: 1; }
 
 .tool-note {
   color: var(--muted);
@@ -698,7 +707,7 @@ h2 {
 }
 
 /* ============================================================= */
-/* Light theme — matches hudwahab.com (white cards on #fafafa)   */
+/* Light theme (white cards on #fafafa)                          */
 /* ============================================================= */
 
 h1 {
@@ -805,3 +814,70 @@ h2 { letter-spacing: -0.1px; }
 @media (max-width: 860px) {
   .section { padding: 22px 20px; }
 }
+
+/* ============================================================= */
+/* Work phases panel                                             */
+/* ============================================================= */
+.phase-bar {
+  display: flex;
+  height: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+}
+.phase-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.phase-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+.phase-leg { display: inline-flex; align-items: center; gap: 6px; }
+.phase-sw { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+.model-intensity { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+.mdl-int-row { display: grid; grid-template-columns: 110px 1fr 160px; align-items: center; gap: 12px; }
+.mdl-int-label { font-size: 13px; font-weight: 500; text-align: right; }
+.mdl-int-wrap { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.mdl-int-bar { height: 100%; border-radius: 5px; transition: width 0.3s; }
+.mdl-int-val { font-size: 12px; color: var(--muted); }
+
+.phase-weeks-head { margin-top: 18px; font-size: 12px; color: var(--muted); }
+.phase-weeks {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 64px;
+  margin-top: 6px;
+}
+.phase-week {
+  flex: 1 1 0;
+  min-width: 3px;
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--hairline);
+}
+
+/* Spec verification */
+.verify-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.verify-tile {
+  padding: 12px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--paper);
+}
+.verify-val { margin-top: 2px; font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) { .verify-stats { grid-template-columns: 1fr; } }

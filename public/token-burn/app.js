@@ -244,36 +244,70 @@ function sumLastDays(n) {
 }
 
 // ---- drivers (breakdown by tool + project) ---------------------------------
+function fmtModel(key) {
+  // "claude-opus-4-8" → "Opus 4.8", "codex:gpt-5-codex" → "GPT-5 Codex", etc.
+  const k = key.replace(/^codex:/, "");
+  if (k.startsWith("claude-")) {
+    const rest = k.slice(7); // strip "claude-"
+    // strip date suffix like -20251001
+    const clean = rest.replace(/-\d{8}$/, "");
+    // "opus-4-8" → "Opus 4.8"
+    return clean.replace(/-(\d+)-(\d+)$/, " $1.$2")
+      .replace(/^(\w)/, (c) => c.toUpperCase())
+      .replace(/-(\w)/, (_, c) => " " + c.toUpperCase());
+  }
+  // GPT models: "gpt-5-codex" → "GPT-5 Codex"
+  return k.replace(/^gpt-/, "GPT-").replace(/-(\w)/g, (_, c) => " " + c.toUpperCase());
+}
+
 function renderBreakdown() {
   const [start, end] = rangeBounds();
   const total = measuredTotalInRange(start, end) || 1;
-  const rows = [];
+  // Build groups (lane header + its sub-rows) then sort groups by lane total.
+  // This keeps models and projects visually under their parent lane.
+  const groups = [];
   for (const lane of DATA.lanes) {
     const laneTotal = laneTotalInRange(lane, start, end);
     if (laneTotal <= 0) continue;
     const est = lane.fidelity !== "exact";
-    rows.push({ name: lane.label, note: `${lane.fidelity} · ${lane.sessions} ${est ? "conversations" : "sessions"}`, tokens: laneTotal, spark: weeklySpark(lane, start, end), bold: true, est });
+    const header = { name: lane.label, note: `${lane.fidelity} · ${lane.sessions} ${est ? "conversations" : "sessions"}`, tokens: laneTotal, spark: weeklySpark(lane, start, end), bold: true, est };
+    const subs = [];
     // top projects within the lane
-    const projs = (lane.byProject || []).slice(0, 4);
-    for (const p of projs) {
+    for (const p of (lane.byProject || []).slice(0, 4)) {
       if (p.tokens <= 0 || p.key === lane.name) continue;
-      rows.push({ name: p.key, note: "project", tokens: p.tokens, indent: true, est });
+      subs.push({ name: p.key, note: "project", tokens: p.tokens, indent: true, est });
     }
+    groups.push({ header, subs, laneTotal });
   }
-  rows.sort((a, b) => (b.bold === a.bold ? b.tokens - a.tokens : (b.bold ? 1 : -1)));
+  groups.sort((a, b) => b.laneTotal - a.laneTotal);
   const body = document.getElementById("breakdownBody");
-  body.innerHTML = rows.map((r) => {
-    const share = ((r.tokens / total) * 100);
+  body.innerHTML = groups.map((g) => {
+    const r = g.header;
+    const share = (r.tokens / total) * 100;
     const sharePct = Math.max(0, Math.min(100, share)).toFixed(0);
     const shareCell = r.est
       ? `<span class="muted">est.</span>`
       : `<div class="share-cell"><div class="share-track"><div class="share-dot" style="--share:${sharePct}%"></div></div><span>${share < 1 ? "<1" : sharePct}%</span></div>`;
-    return `<tr>
-      <td><div class="tool-name"${r.indent ? ' style="font-weight:500;padding-left:14px"' : ''}>${r.name}</div><div class="tool-note">${r.note}</div></td>
+    const headerRow = `<tr>
+      <td><div class="tool-name">${r.name}</div><div class="tool-note">${r.note}</div></td>
       <td>${r.spark || ""}</td>
       <td>${shareCell}</td>
-      <td>${r.est ? "~" : ""}${fmt(r.tokens)}</td>
+      <td>${fmt(r.tokens)}</td>
     </tr>`;
+    const subRows = g.subs.map((s) => {
+      const ss = (s.tokens / total) * 100;
+      const ssPct = Math.max(0, Math.min(100, ss)).toFixed(0);
+      const subShare = s.est
+        ? `<span class="muted">est.</span>`
+        : `<div class="share-cell"><div class="share-track"><div class="share-dot" style="--share:${ssPct}%"></div></div><span>${ss < 1 ? "<1" : ssPct}%</span></div>`;
+      return `<tr>
+        <td><div class="tool-name" style="font-weight:500;padding-left:14px">${s.name}</div><div class="tool-note">${s.note}</div></td>
+        <td></td>
+        <td>${subShare}</td>
+        <td>${s.est ? "~" : ""}${fmt(s.tokens)}</td>
+      </tr>`;
+    }).join("");
+    return headerRow + subRows;
   }).join("");
 }
 function weeklySpark(lane, start, end) {
@@ -368,11 +402,120 @@ function renderEquivalents() {
   ).join("");
 }
 
+// ---- work phases (tool-action classification) ------------------------------
+const PHASE_COLORS = { plan: "#3b82f6", code: "#10b981", docs: "#a855f7", test: "#ef4444", ops: "#94a3b8" };
+const PHASE_LABEL = { plan: "Plan / explore", code: "Code", docs: "Docs / spec", test: "Test / verify", ops: "Ops / run" };
+// ---- model mix -------------------------------------------------------------
+const MODEL_COLORS = ["#f59e0b", "#34d6f0", "#f97316", "#6366f1", "#94a3b8"];
+
+function renderModelMix() {
+  const lane = (DATA.lanes || []).find((l) => l.name === "claude-code");
+  const barEl = document.getElementById("modelBar");
+  const legEl = document.getElementById("modelLegend");
+  const intEl = document.getElementById("modelIntensity");
+  if (!lane || !barEl) return;
+  const models = (lane.byModel || []).filter((m) => m.tokens > 0);
+  const total = models.reduce((s, m) => s + m.tokens, 0) || 1;
+
+  barEl.innerHTML = models.map((m, i) => {
+    const pct = m.tokens / total * 100;
+    if (pct < 0.5) return "";
+    const color = MODEL_COLORS[i] || MODEL_COLORS[MODEL_COLORS.length - 1];
+    const label = fmtModel(m.key);
+    return `<div class="phase-seg" style="width:${pct}%;background:${color}" title="${label} — ${pct.toFixed(0)}% (${fmt(m.tokens)})">${pct >= 10 ? label + " " + pct.toFixed(0) + "%" : ""}</div>`;
+  }).join("");
+
+  legEl.innerHTML = models.filter((m) => m.tokens / total * 100 >= 0.5).map((m, i) => {
+    const pct = m.tokens / total * 100;
+    const color = MODEL_COLORS[i] || MODEL_COLORS[MODEL_COLORS.length - 1];
+    return `<span class="phase-leg"><span class="phase-sw" style="background:${color}"></span>${fmtModel(m.key)} <strong>${pct.toFixed(0)}%</strong> <span class="muted">${fmt(m.tokens)}</span></span>`;
+  }).join("");
+
+  const rates = models.map((m) => {
+    if (!m.firstDay || !m.lastDay) return 0;
+    return m.tokens / Math.max(1, (parseDay(m.lastDay) - parseDay(m.firstDay)) / 86400000 + 1);
+  });
+  const maxRate = Math.max(...rates, 1);
+  intEl.innerHTML = models.map((m, i) => {
+    if (!m.firstDay || !m.lastDay) return "";
+    const days = Math.max(1, (parseDay(m.lastDay) - parseDay(m.firstDay)) / 86400000 + 1);
+    const rate = m.tokens / days;
+    const pct = rate / maxRate * 100;
+    const color = MODEL_COLORS[i] || MODEL_COLORS[MODEL_COLORS.length - 1];
+    return `<div class="mdl-int-row">
+      <span class="mdl-int-label">${fmtModel(m.key)}</span>
+      <div class="mdl-int-wrap"><div class="mdl-int-bar" style="width:${pct}%;background:${color}"></div></div>
+      <span class="mdl-int-val">${fmt(Math.round(rate))}/day · ${Math.round(days)}d active</span>
+    </div>`;
+  }).filter(Boolean).join("");
+}
+
+function renderPhases() {
+  const ph = DATA.phases;
+  const bar = document.getElementById("phaseBar");
+  const legend = document.getElementById("phaseLegend");
+  const wkEl = document.getElementById("phaseWeeks");
+  if (!ph || !bar) { return; }
+  const order = (ph.order || Object.keys(ph.total || {})).filter((p) => PHASE_COLORS[p]);
+  const [start, end] = rangeBounds();
+  // sum within range from the weekly breakdown (so it tracks the range toggle)
+  const weeks = Object.keys(ph.byWeek || {}).filter((w) => { const d = parseDay(w); return d >= addDays(start, -6) && d <= end; }).sort();
+  const totals = {}; order.forEach((p) => totals[p] = 0);
+  for (const w of weeks) { const m = ph.byWeek[w] || {}; for (const p of order) totals[p] += (m[p] || 0); }
+  const grand = order.reduce((s, p) => s + totals[p], 0) || 1;
+
+  bar.innerHTML = order.map((p) => {
+    const pct = totals[p] / grand * 100;
+    if (pct <= 0) return "";
+    return `<div class="phase-seg" style="width:${pct}%;background:${PHASE_COLORS[p]}" title="${PHASE_LABEL[p]} — ${pct.toFixed(0)}% (${totals[p].toLocaleString()})">${pct >= 9 ? PHASE_LABEL[p].split(" ")[0] + " " + pct.toFixed(0) + "%" : ""}</div>`;
+  }).join("");
+
+  legend.innerHTML = order.map((p) => {
+    const pct = totals[p] / grand * 100;
+    return `<span class="phase-leg"><span class="phase-sw" style="background:${PHASE_COLORS[p]}"></span>${PHASE_LABEL[p]} <strong>${pct.toFixed(0)}%</strong> <span class="muted">${totals[p].toLocaleString()}</span></span>`;
+  }).join("");
+
+  // per-week normalized stacked bars (shows how the MIX shifts over time)
+  wkEl.innerHTML = weeks.map((w) => {
+    const m = ph.byWeek[w] || {};
+    const tot = order.reduce((s, p) => s + (m[p] || 0), 0) || 1;
+    const segs = order.map((p) => { const h = (m[p] || 0) / tot * 100; return h > 0 ? `<div style="height:${h}%;background:${PHASE_COLORS[p]}"></div>` : ""; }).join("");
+    return `<div class="phase-week" title="week of ${w} · ${tot} actions">${segs}</div>`;
+  }).join("");
+}
+
+// ---- spec verification -----------------------------------------------------
+function renderVerify() {
+  const v = DATA.verification;
+  const el = document.getElementById("verifyStats");
+  if (!v || !el) return;
+  const [start, end] = rangeBounds();
+  const weeks = Object.keys(v.byWeek || {}).filter((w) => { const d = parseDay(w); return d >= addDays(start, -6) && d <= end; }).sort();
+  let runs = 0, passed = 0, failed = 0;
+  for (const w of weeks) { const x = v.byWeek[w]; runs += x.runs; passed += x.passed; failed += x.failed; }
+  const decided = passed + failed;
+  const pr = decided > 0 ? Math.round(passed / decided * 100) : null;
+  const sc = v.specCoverage;
+  const tiles = [
+    { label: "Verify runs", value: runs.toLocaleString(), note: "captured in logs" },
+    { label: "Pass rate", value: pr != null ? pr + "%" : "—", note: `${passed.toLocaleString()} pass · ${failed.toLocaleString()} fail` },
+    { label: "Spec coverage", value: sc ? "~" + sc.avgPct + "%" : "—", note: sc ? `${sc.over80}/${sc.samples} runs ≥80% (overall)` : "no X/Y lines captured" },
+  ];
+  el.innerHTML = tiles.map((t) => `<div class="verify-tile"><div class="now-label">${t.label}</div><div class="verify-val">${t.value}</div><div class="now-note">${t.note}</div></div>`).join("");
+  document.getElementById("verifyWeeks").innerHTML = weeks.map((w) => {
+    const x = v.byWeek[w]; const tot = (x.passed + x.failed) || 1;
+    return `<div class="phase-week" title="week of ${w} · ${x.runs} runs · ${x.passed} pass / ${x.failed} fail"><div style="height:${x.failed / tot * 100}%;background:#ef4444"></div><div style="height:${x.passed / tot * 100}%;background:#10b981"></div></div>`;
+  }).join("");
+}
+
 // ---- orchestration ---------------------------------------------------------
 function renderAll() {
   renderNowStrip();
   renderCalendar();
   renderBreakdown();
+  renderModelMix();
+  renderPhases();
+  renderVerify();
   renderTrend();
   renderRecent();
   renderEquivalents();
@@ -390,6 +533,12 @@ fetch("data.json")
   .then((r) => r.json())
   .then((d) => {
     DATA = d;
+    // personalize the title from local config (generic in the repo / public build)
+    if (d.owner) {
+      const t = `${d.owner}'s AI Token Burn`;
+      document.title = t;
+      const h = document.getElementById("pageTitle"); if (h) h.textContent = t;
+    }
     // reflect the initial range on the control buttons
     for (const b of document.querySelectorAll("#rangeControls button")) {
       if (b.dataset.range === range) b.setAttribute("aria-pressed", "true");

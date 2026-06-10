@@ -4,7 +4,7 @@
   <base href="/token-burn/" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hud's AI Token Burn</title>
+  <title>AI Token Burn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
@@ -14,7 +14,7 @@
   <main>
     <header>
       <div>
-        <h1>Hud's AI Token Burn</h1>
+        <h1 id="pageTitle">AI Token Burn</h1>
         <p class="dek">Daily token volume across Claude Code and Codex, counted exactly from
           local logs, plus a labeled estimate band for chat tools that report no tokens.
           Measured lanes are never summed with estimates.</p>
@@ -60,6 +60,37 @@
         </thead>
         <tbody id="breakdownBody"></tbody>
       </table>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Model mix</h2>
+        <span class="note">Share of Claude Code tokens by model — stacked by volume, intensity = tokens/active day</span>
+      </div>
+      <div class="phase-bar" id="modelBar"></div>
+      <div class="phase-legend" id="modelLegend"></div>
+      <div class="model-intensity" id="modelIntensity"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Work phases</h2>
+        <span class="note">Share of Claude Code tool actions — heuristic, not annotated</span>
+      </div>
+      <div class="phase-bar" id="phaseBar"></div>
+      <div class="phase-legend" id="phaseLegend"></div>
+      <div class="phase-weeks-head">Mix per week →</div>
+      <div class="phase-weeks" id="phaseWeeks"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Spec verification</h2>
+        <span class="note">Numbers from test/verify output — partial (only saved runs)</span>
+      </div>
+      <div class="verify-stats" id="verifyStats"></div>
+      <div class="phase-weeks-head">Pass / fail per week →</div>
+      <div class="phase-weeks" id="verifyWeeks"></div>
     </section>
 
     <section class="section">
