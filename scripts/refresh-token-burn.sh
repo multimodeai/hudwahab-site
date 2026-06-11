@@ -34,8 +34,20 @@ if ! grep -q 'base href="/token-burn/"' "$DEST/index.html"; then
   echo "  injected <base> tag for clean-URL asset resolution"
 fi
 
-echo "→ Reviewing data.json project labels (scan for non-public names):"
-grep -oE '"[a-zA-Z0-9_-]+"' "$DEST/data.json" | sort -u | grep -iE "client|internal|halalmemes|prowasl-|secret" || echo "  (no obvious client/internal labels — eyeball byProject before pushing)"
+# ── Privacy gate (HARD fail) ──────────────────────────────────────────────────
+# The scrubbed build strips machine prefixes (mac:/ubuntu:) and aliases/redacts
+# real project names. If either leaks through, the build was NOT scrubbed —
+# abort so a public deploy can never expose client/internal names.
+echo "→ Privacy gate: verifying data.json is scrubbed…"
+if grep -qE '"(mac|ubuntu):' "$DEST/data.json"; then
+  echo "✗ ABORT: machine-prefixed real project names present — scrub did NOT run."
+  exit 1
+fi
+if grep -qiE 'issa|rfp[_-]?monitor|orion-inference|amanah|sovereign-agentic|agent-platform|subagents' "$DEST/data.json"; then
+  echo "✗ ABORT: a known-sensitive project name leaked into data.json."
+  exit 1
+fi
+echo "  ✓ scrubbed — no machine prefixes or known sensitive names"
 
 echo
 echo "✓ Done. Review the diff, then:"
