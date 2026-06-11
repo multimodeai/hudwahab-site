@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-06-10T23:03:30.859Z",
+  "generatedAt": "2026-06-11T15:28:48.488Z",
   "owner": null,
-  "estimatedCostUsd": 11543,
+  "estimatedCostUsd": 11674,
   "lanes": [
     {
       "name": "claude-code",
       "label": "Claude Code",
       "fidelity": "exact",
-      "total": 4917666097,
+      "total": 4985799623,
       "sessions": 52,
       "firstDay": "2026-02-10",
-      "lastDay": "2026-06-10",
+      "lastDay": "2026-06-11",
       "breakdown": {
-        "input": 1193903,
-        "output": 19326287,
-        "cacheCreate": 257257712,
-        "cacheRead": 4639888195
+        "input": 1201146,
+        "output": 19567364,
+        "cacheCreate": 259905211,
+        "cacheRead": 4705125902
       },
       "byDay": {
         "2026-06-02": 250152597,
@@ -24,6 +24,7 @@
         "2026-06-04": 221220831,
         "2026-06-05": 195359168,
         "2026-06-06": 110359281,
+        "2026-06-11": 37149339,
         "2026-06-09": 113076598,
         "2026-04-25": 23748587,
         "2026-04-26": 19960692,
@@ -42,7 +43,7 @@
         "2026-05-29": 289648336,
         "2026-05-30": 43294356,
         "2026-06-08": 89920329,
-        "2026-06-10": 172425914,
+        "2026-06-10": 203410101,
         "2026-04-06": 50826065,
         "2026-04-18": 14450793,
         "2026-04-21": 96276617,
@@ -123,26 +124,26 @@
         "2026-05-18": 543096983,
         "2026-05-25": 752571441,
         "2026-06-01": 1263504646,
-        "2026-06-08": 375422841
+        "2026-06-08": 443556367
       },
       "byModel": [
         {
           "key": "claude-opus-4-7",
-          "tokens": 3061269591,
+          "tokens": 3093330675,
           "firstDay": "2026-04-29",
-          "lastDay": "2026-06-10"
+          "lastDay": "2026-06-11"
         },
         {
           "key": "claude-opus-4-8",
-          "tokens": 875942657,
+          "tokens": 894837003,
           "firstDay": "2026-06-01",
-          "lastDay": "2026-06-10"
+          "lastDay": "2026-06-11"
         },
         {
           "key": "claude-sonnet-4-6",
-          "tokens": 757420731,
+          "tokens": 774598827,
           "firstDay": "2026-02-20",
-          "lastDay": "2026-06-10"
+          "lastDay": "2026-06-11"
         },
         {
           "key": "claude-opus-4-6",
@@ -170,7 +171,7 @@
         },
         {
           "key": "mm-cli",
-          "tokens": 1129323662
+          "tokens": 1144878842
         },
         {
           "key": "prowasl",
@@ -178,7 +179,7 @@
         },
         {
           "key": "project-7",
-          "tokens": 727216012
+          "tokens": 759277096
         },
         {
           "key": "project-1",
@@ -186,19 +187,19 @@
         },
         {
           "key": "stealth-project-2",
-          "tokens": 182905014
+          "tokens": 194223784
         },
         {
           "key": "personal-site",
-          "tokens": 105408409
+          "tokens": 111585587
+        },
+        {
+          "key": "project-9",
+          "tokens": 87866356
         },
         {
           "key": "project-5",
           "tokens": 86446382
-        },
-        {
-          "key": "project-9",
-          "tokens": 84845042
         },
         {
           "key": "project-3",
@@ -481,10 +482,10 @@
       "ops"
     ],
     "total": {
-      "ops": 3931,
-      "plan": 1668,
-      "code": 928,
-      "docs": 909,
+      "ops": 4010,
+      "plan": 1692,
+      "code": 939,
+      "docs": 920,
       "test": 66
     },
     "byWeek": {
@@ -586,11 +587,11 @@
         "test": 30
       },
       "2026-06-08": {
-        "plan": 176,
-        "ops": 273,
-        "code": 133,
+        "plan": 200,
+        "ops": 352,
+        "code": 144,
         "test": 1,
-        "docs": 67
+        "docs": 78
       }
     },
     "note": "Share of Claude Code tool actions (Read/Grep/Todo=plan, Edit/Write=code, .md=docs, Bash test/verify=test, other Bash/mcp=ops, no-tool reply=reason). Counts, heuristic, not annotated."
