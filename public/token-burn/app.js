@@ -195,10 +195,29 @@ function sparkRow(weeklyTotals, gridW, gridStart, start, end) {
 }
 
 // ---- helpers over a window -------------------------------------------------
-function laneTotalInRange(lane, start, end) {
+// generic: sum a {day: tokens} map within [start,end]. Used for lane totals,
+// per-model totals, and per-project totals alike (all serialize a byDay map).
+function sumDayMapInRange(dayMap, start, end) {
   let t = 0;
-  for (const k in lane.byDay) { const d = parseDay(k); if (d >= start && d <= end) t += lane.byDay[k]; }
+  for (const k in dayMap) { const d = parseDay(k); if (d >= start && d <= end) t += dayMap[k]; }
   return t;
+}
+// busiest single day within [start,end] for a {day: tokens} map, or null.
+function peakInRange(dayMap, start, end) {
+  let day = null, tokens = 0;
+  for (const k in dayMap) {
+    const d = parseDay(k); if (d < start || d > end) continue;
+    if (dayMap[k] > tokens) { tokens = dayMap[k]; day = k; }
+  }
+  return day ? { day, tokens } : null;
+}
+function activeDaysInRange(dayMap, start, end) {
+  let n = 0;
+  for (const k in dayMap) { const d = parseDay(k); if (d >= start && d <= end && dayMap[k] > 0) n++; }
+  return n;
+}
+function laneTotalInRange(lane, start, end) {
+  return sumDayMapInRange(lane.byDay, start, end);
 }
 function measuredTotalInRange(start, end) {
   return exactLanes().reduce((s, l) => s + laneTotalInRange(l, start, end), 0);
@@ -261,9 +280,15 @@ function fmtModel(key) {
   return k.replace(/^gpt-/, "GPT-").replace(/-(\w)/g, (_, c) => " " + c.toUpperCase());
 }
 
+// Driver ("work-family") categories = tracked project directories, the most
+// defensible real grouping available — the logs carry no session-content or
+// topic field, so this deliberately does NOT infer a task-type/topic taxonomy.
+// Evidence lines below are real per-project facts (peak day, active-day count)
+// pulled straight from each project's own byDay map, never invented.
 function renderBreakdown() {
   const [start, end] = rangeBounds();
   const total = measuredTotalInRange(start, end) || 1;
+  const rangeDays = Math.round((end - start) / 86400000) + 1;
   // Build groups (lane header + its sub-rows) then sort groups by lane total.
   // This keeps models and projects visually under their parent lane.
   const groups = [];
@@ -272,12 +297,27 @@ function renderBreakdown() {
     if (laneTotal <= 0) continue;
     const est = lane.fidelity !== "exact";
     const header = { name: lane.label, note: `${lane.fidelity} · ${lane.sessions} ${est ? "conversations" : "sessions"}`, tokens: laneTotal, spark: weeklySpark(lane, start, end), bold: true, est };
-    const subs = [];
-    // top projects within the lane
-    for (const p of (lane.byProject || []).slice(0, 4)) {
-      if (p.tokens <= 0 || p.key === lane.name) continue;
-      subs.push({ name: p.key, note: "project", tokens: p.tokens, indent: true, est });
-    }
+    // range-filter every project this lane tracked, then keep the top 4 by
+    // in-range volume (not lifetime volume — a project quiet in this window
+    // shouldn't crowd out one that's actually active in it).
+    const projRows = (lane.byProject || [])
+      .filter((p) => p.key !== lane.name)
+      .map((p) => {
+        const hasDay = p.byDay && Object.keys(p.byDay).length > 0;
+        const rangeTokens = hasDay ? sumDayMapInRange(p.byDay, start, end) : p.tokens;
+        const peak = hasDay ? peakInRange(p.byDay, start, end) : (p.peakDay ? { day: p.peakDay, tokens: p.peakTokens } : null);
+        const active = hasDay ? activeDaysInRange(p.byDay, start, end) : null;
+        return { p, rangeTokens, peak, active };
+      })
+      .filter((r) => r.rangeTokens > 0)
+      .sort((a, b) => b.rangeTokens - a.rangeTokens)
+      .slice(0, 4);
+    const subs = projRows.map(({ p, rangeTokens, peak, active }) => {
+      const evidence = peak
+        ? `peak ${fmtDate(parseDay(peak.day))}: ${fmt(peak.tokens)} tokens${active != null ? ` · active ${active}/${rangeDays}d in range` : ""}`
+        : (active != null ? `active ${active}/${rangeDays}d in range` : "");
+      return { name: p.key, note: "project", evidence, tokens: rangeTokens, indent: true, est };
+    });
     groups.push({ header, subs, laneTotal });
   }
   groups.sort((a, b) => b.laneTotal - a.laneTotal);
@@ -302,7 +342,7 @@ function renderBreakdown() {
         ? `<span class="muted">est.</span>`
         : `<div class="share-cell"><div class="share-track"><div class="share-dot" style="--share:${ssPct}%"></div></div><span>${ss < 1 ? "<1" : ssPct}%</span></div>`;
       return `<tr>
-        <td><div class="tool-name" style="font-weight:500;padding-left:14px">${s.name}</div><div class="tool-note">${s.note}</div></td>
+        <td><div class="tool-name" style="font-weight:500;padding-left:14px">${s.name}</div><div class="tool-note">${s.note}</div>${s.evidence ? `<div class="tool-evidence">${s.evidence}</div>` : ""}</td>
         <td></td>
         <td>${subShare}</td>
         <td>${s.est ? "~" : ""}${fmt(s.tokens)}</td>
@@ -371,31 +411,77 @@ function trendPanel({ title, series, fmtLast }) {
   </div>`;
 }
 
-// ---- recent days table -----------------------------------------------------
+// ---- recent days table -------------------------------------------------
+// Granular per-day view: exact lanes (Claude Code, Codex) get their own
+// columns plus an exact-only Total; ChatGPT is split into its real fidelity
+// sub-tiers (text-tokenized / dated-fallback / manual activity — whichever
+// ones this machine's data actually has) rather than one blended estimate
+// number. Exact and estimated cells are styled distinctly and never merged.
+const SUBTIER_LABEL = { text: "ChatGPT — text est.", dated: "ChatGPT — dated est.", manual: "ChatGPT — manual est." };
+const SUBTIER_ORDER = ["text", "dated", "manual"];
+
 function renderRecent() {
-  const dayMap = {}; // k -> {claude, codex}
+  const dayMap = {}; // k -> {claude-code, codex, chatgpt}
   for (const lane of DATA.lanes) for (const k in lane.byDay) {
     dayMap[k] = dayMap[k] || {};
     dayMap[k][lane.name] = lane.byDay[k];
   }
+  const gptLane = DATA.lanes.find((l) => l.name === "chatgpt");
+  const subDay = (gptLane && gptLane.bySubDay) || {};
+  // only show a sub-tier column if it actually has data somewhere — an unused
+  // tier (e.g. no manual activity.json ever filled in) shouldn't clutter the table
+  const activeTiers = SUBTIER_ORDER.filter((t) => Object.values(subDay).some((m) => (m[t] || 0) > 0));
+  const showCombined = activeTiers.length > 1; // 2+ real tiers -> also show their (still-estimate) sum
+
+  const headEl = document.getElementById("recentHead");
+  if (headEl) {
+    const cols = ["Date", "Claude Code (exact)", "Codex (exact)", "Total (exact)"]
+      .concat(activeTiers.map((t) => SUBTIER_LABEL[t]))
+      .concat(showCombined ? ["ChatGPT total (est.)"] : []);
+    headEl.innerHTML = cols.map((c) => `<th>${c}</th>`).join("");
+  }
+
   const keys = Object.keys(dayMap).sort().reverse().slice(0, 14);
   document.getElementById("recentBody").innerHTML = keys.map((k) => {
-    const cc = dayMap[k]["claude-code"] || 0, cx = dayMap[k]["codex"] || 0, gp = dayMap[k]["chatgpt"] || 0;
-    return `<tr><td>${fmtDate(parseDay(k), true)}</td><td>${fmt(cc + cx)}</td><td>${cc ? fmt(cc) : "—"}</td><td>${cx ? fmt(cx) : "—"}</td><td class="muted">${gp ? "~" + fmt(gp) : "—"}</td></tr>`;
+    const cc = dayMap[k]["claude-code"] || 0, cx = dayMap[k]["codex"] || 0;
+    const sub = subDay[k] || {};
+    const tierCells = activeTiers.map((t) => {
+      const v = sub[t] || 0;
+      return `<td class="estimate-cell">${v ? "~" + fmt(v) : "—"}</td>`;
+    }).join("");
+    const combinedCell = showCombined
+      ? (() => { const v = activeTiers.reduce((s, t) => s + (sub[t] || 0), 0); return `<td class="estimate-cell">${v ? "~" + fmt(v) : "—"}</td>`; })()
+      : "";
+    return `<tr>
+      <td>${fmtDate(parseDay(k), true)}</td>
+      <td class="exact-cell">${cc ? fmt(cc) : "—"}</td>
+      <td class="exact-cell">${cx ? fmt(cx) : "—"}</td>
+      <td class="exact-cell"><strong>${fmt(cc + cx)}</strong></td>
+      ${tierCells}${combinedCell}
+    </tr>`;
   }).join("");
 }
 
-// ---- scale equivalents (Fermi) ---------------------------------------------
+// ---- scale equivalents (Fermi) ----------------------------------------
+// These are rough order-of-magnitude TRANSLATIONS, not measured utility,
+// billing, or environmental accounting. Every factor is stated inline in the
+// "Basis" column so nothing here is presented as a fact the way the exact
+// lanes are — they're for intuition about scale, and only that.
 function renderEquivalents() {
   const [start, end] = rangeBounds();
   const total = measuredTotalInRange(start, end);
-  const words = total * 0.75;            // ~0.75 words / token
-  const books = words / 90000;           // ~90k words / novel
-  const kjEnergy = total / 1000 * 0.3;   // rough order-of-magnitude inference energy
+  const words = total * 0.75;              // ~0.75 words / token
+  const books = words / 90000;             // ~90k words / novel
+  const linesOfCode = total / 12;          // ~12 tokens / line (denser than prose: syntax, indentation)
+  const energyKwh = (total * 0.0004) / 1000; // ~0.0004 Wh/token, rough blended inference-energy order-of-magnitude
+  const waterL = energyKwh * 1.8;          // ~1.8 L/kWh, rough datacenter-cooling order-of-magnitude
   const rows = [
     { m: "Tokens (measured)", e: fmtFull(total), b: "Claude Code + Codex, exact" },
-    { m: "≈ Words", e: fmt(words), b: "~0.75 words per token" },
-    { m: "≈ Novels", e: books.toFixed(books < 10 ? 1 : 0), b: "~90,000 words each" },
+    { m: "≈ Words", e: fmt(words), b: "~0.75 words per token — rough translation, not measured" },
+    { m: "≈ Novels", e: books < 10 ? books.toFixed(1) : Math.round(books).toLocaleString("en-US"), b: "~90,000 words each — rough translation, not measured" },
+    { m: "≈ Lines of code", e: fmt(linesOfCode), b: "~12 tokens per line, if this were all code — rough translation, not measured" },
+    { m: "≈ Electricity", e: energyKwh < 1 ? energyKwh.toFixed(2) + " kWh" : fmt(energyKwh) + " kWh", b: "~0.0004 Wh/token, order-of-magnitude inference-energy guess — NOT a measured/billed figure, varies hugely by model & hardware" },
+    { m: "≈ Water", e: waterL < 1 ? waterL.toFixed(2) + " L" : fmt(waterL) + " L", b: "~1.8 L per kWh, order-of-magnitude datacenter-cooling guess — NOT a measured/billed figure" },
     { m: "Sessions", e: fmtFull(DATA.lanes.reduce((s, l) => s + l.sessions, 0)), b: "distinct conversations" },
   ];
   document.getElementById("equivBody").innerHTML = rows.map((r) =>
@@ -415,38 +501,45 @@ function renderModelMix() {
   const legEl = document.getElementById("modelLegend");
   const intEl = document.getElementById("modelIntensity");
   if (!lane || !barEl) return;
-  const models = (lane.byModel || []).filter((m) => m.tokens > 0);
-  const total = models.reduce((s, m) => s + m.tokens, 0) || 1;
+  const [start, end] = rangeBounds();
+  // range-filter using each model's own per-day map, same window as everything
+  // else the range control drives — falls back to the lifetime total only if
+  // a data.json predates the byDay-per-model field (older build, still readable).
+  const models = (lane.byModel || [])
+    .map((m) => ({ ...m, rangeTokens: m.byDay && Object.keys(m.byDay).length ? sumDayMapInRange(m.byDay, start, end) : m.tokens }))
+    .filter((m) => m.rangeTokens > 0);
+  const total = models.reduce((s, m) => s + m.rangeTokens, 0) || 1;
 
   barEl.innerHTML = models.map((m, i) => {
-    const pct = m.tokens / total * 100;
+    const pct = m.rangeTokens / total * 100;
     if (pct < 0.5) return "";
     const color = MODEL_COLORS[i] || MODEL_COLORS[MODEL_COLORS.length - 1];
     const label = fmtModel(m.key);
-    return `<div class="phase-seg" style="width:${pct}%;background:${color}" title="${label} — ${pct.toFixed(0)}% (${fmt(m.tokens)})">${pct >= 10 ? label + " " + pct.toFixed(0) + "%" : ""}</div>`;
+    return `<div class="phase-seg" style="width:${pct}%;background:${color}" title="${label} — ${pct.toFixed(0)}% (${fmt(m.rangeTokens)})">${pct >= 10 ? label + " " + pct.toFixed(0) + "%" : ""}</div>`;
   }).join("");
 
-  legEl.innerHTML = models.filter((m) => m.tokens / total * 100 >= 0.5).map((m, i) => {
-    const pct = m.tokens / total * 100;
+  legEl.innerHTML = models.filter((m) => m.rangeTokens / total * 100 >= 0.5).map((m, i) => {
+    const pct = m.rangeTokens / total * 100;
     const color = MODEL_COLORS[i] || MODEL_COLORS[MODEL_COLORS.length - 1];
-    return `<span class="phase-leg"><span class="phase-sw" style="background:${color}"></span>${fmtModel(m.key)} <strong>${pct.toFixed(0)}%</strong> <span class="muted">${fmt(m.tokens)}</span></span>`;
+    return `<span class="phase-leg"><span class="phase-sw" style="background:${color}"></span>${fmtModel(m.key)} <strong>${pct.toFixed(0)}%</strong> <span class="muted">${fmt(m.rangeTokens)}</span></span>`;
   }).join("");
 
+  // active-day count clipped to the selected range (not the model's lifetime span)
   const rates = models.map((m) => {
-    if (!m.firstDay || !m.lastDay) return 0;
-    return m.tokens / Math.max(1, (parseDay(m.lastDay) - parseDay(m.firstDay)) / 86400000 + 1);
+    const days = m.byDay ? activeDaysInRange(m.byDay, start, end) : 0;
+    return days ? m.rangeTokens / days : 0;
   });
   const maxRate = Math.max(...rates, 1);
   intEl.innerHTML = models.map((m, i) => {
-    if (!m.firstDay || !m.lastDay) return "";
-    const days = Math.max(1, (parseDay(m.lastDay) - parseDay(m.firstDay)) / 86400000 + 1);
-    const rate = m.tokens / days;
+    const days = m.byDay ? activeDaysInRange(m.byDay, start, end) : 0;
+    if (!days) return "";
+    const rate = m.rangeTokens / days;
     const pct = rate / maxRate * 100;
     const color = MODEL_COLORS[i] || MODEL_COLORS[MODEL_COLORS.length - 1];
     return `<div class="mdl-int-row">
       <span class="mdl-int-label">${fmtModel(m.key)}</span>
       <div class="mdl-int-wrap"><div class="mdl-int-bar" style="width:${pct}%;background:${color}"></div></div>
-      <span class="mdl-int-val">${fmt(Math.round(rate))}/day · ${Math.round(days)}d active</span>
+      <span class="mdl-int-val">${fmt(Math.round(rate))}/day · ${days}d active in range</span>
     </div>`;
   }).filter(Boolean).join("");
 }

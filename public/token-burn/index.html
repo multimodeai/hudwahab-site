@@ -54,6 +54,10 @@
         <h2>What is driving the burn?</h2>
         <span class="note">Sorted by tool and project; exact lanes plus separated estimate</span>
       </div>
+      <p class="lead-note">Categories = tracked project directories (real, from local log paths) — the
+        most defensible honest grouping available. There is no session-content or topic field in these
+        logs, so this deliberately does not infer a work-type/topic taxonomy. Evidence lines below (peak
+        day, active-day count) are real per-project facts, not summaries.</p>
       <table class="breakdown-table">
         <thead>
           <tr><th>Driver</th><th>Trend</th><th>Share</th><th>Total</th></tr>
@@ -104,21 +108,26 @@
     <section class="section">
       <div class="section-head">
         <h2>Recent days</h2>
-        <span class="note">Last 14 active days, Pacific-agnostic local dates</span>
+        <span class="note">Last 14 active days · exact and estimated columns kept separate, never blended</span>
       </div>
-      <table class="recent-table">
-        <thead>
-          <tr><th>Date</th><th>Total</th><th>Claude Code</th><th>Codex</th><th>ChatGPT</th></tr>
-        </thead>
-        <tbody id="recentBody"></tbody>
-      </table>
+      <div class="recent-table-wrap">
+        <table class="recent-table">
+          <thead>
+            <tr id="recentHead"></tr>
+          </thead>
+          <tbody id="recentBody"></tbody>
+        </table>
+      </div>
     </section>
 
     <section class="section">
       <div class="section-head">
         <h2>Scale equivalents</h2>
-        <span class="note">Fermi estimates from the current measured total</span>
+        <span class="note">Scale translations, not measured utility/billing/environmental accounting</span>
       </div>
+      <p class="lead-note">Rough Fermi (order-of-magnitude) estimates from the current measured total.
+        Each conversion factor is stated plainly in the Basis column — none of this is a billed,
+        metered, or scientifically measured figure.</p>
       <table class="equivalent-table">
         <thead>
           <tr><th>Measure</th><th>Equivalent</th><th>Basis</th></tr>

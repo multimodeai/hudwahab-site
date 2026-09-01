@@ -244,6 +244,32 @@ h2 {
   margin-top: 1px;
 }
 
+.tool-evidence {
+  color: var(--muted);
+  font-size: 11px;
+  font-style: italic;
+  margin-top: 2px;
+  white-space: normal;
+}
+
+/* Recent-days table: exact vs. estimate cells must read as visually distinct
+   at a glance, never blended into one number. */
+.recent-table-wrap {
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.recent-table .exact-cell {
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.recent-table .estimate-cell {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-style: italic;
+}
+
 .spark {
   width: 118px;
   height: 26px;
