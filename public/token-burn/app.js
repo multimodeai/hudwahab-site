@@ -8,7 +8,9 @@ const tooltip = document.getElementById("tooltip");
 // ---- formatting ------------------------------------------------------------
 const fmt = (n) => {
   n = Math.round(n);
-  if (n >= 1e9) return (n / 1e9).toFixed(n >= 1e10 ? 0 : 2).replace(/\.?0+$/, "") + "B";
+  // >=10B has no decimals, so never trim zeros there ("20" was being cut to "2")
+  if (n >= 1e10) return (n / 1e9).toFixed(0) + "B";
+  if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.?0+$/, "") + "B";
   if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e8 ? 0 : 1).replace(/\.0$/, "") + "M";
   if (n >= 1e3) return (n / 1e3).toFixed(n >= 1e5 ? 0 : 1).replace(/\.0$/, "") + "K";
   return "" + n;
